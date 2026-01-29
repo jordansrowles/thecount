@@ -1,0 +1,381 @@
+/**
+ * Main application shell.
+ * Manages view switching, modals, keyboard shortcuts, and celebrations.
+ */
+import { store } from '../js/store.js';
+import './app-header.js';
+import './dashboard-view.js';
+import './create-view.js';
+import './count-view.js';
+
+class CountApp extends HTMLElement {
+    connectedCallback() {
+        this.render();
+
+        this._unsubs = [
+            store.on('view-changed', (e) => this.updateView(e.detail.view)),
+            store.on('notification', (e) => this.showNotification(e.detail.text)),
+            store.on('celebration', () => this.celebrate())
+        ];
+
+        this.setupModals();
+        this.setupKeyboardShortcuts();
+
+        // Listen for modal events from child components
+        this.addEventListener('show-custom-value-modal', (e) => this.showCustomValueModal(e.detail));
+        this.addEventListener('show-history-modal', () => this.showHistoryModal());
+        this.addEventListener('show-upload-backup-modal', () => this.showUploadBackupModal());
+        this.addEventListener('show-delete-count-modal', (e) => this.showDeleteCountModal(e.detail.countId));
+
+        // Initialize
+        store.init();
+    }
+
+    disconnectedCallback() {
+        this._unsubs?.forEach(fn => fn());
+    }
+
+    render() {
+        this.innerHTML = `
+            <div class="container">
+                <app-header></app-header>
+                <div class="content">
+                    <dashboard-view id="dashboard-view"></dashboard-view>
+                    <create-view id="create-view" class="hidden"></create-view>
+                    <count-view id="count-view" class="hidden"></count-view>
+                </div>
+            </div>
+
+            <!-- Custom Value Modal -->
+            <div id="custom-value-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modal-title">Enter Value</h3>
+                        <p id="modal-description"></p>
+                    </div>
+                    <input type="number" id="modal-input" class="modal-input" placeholder="Enter amount..." min="1">
+                    <div class="modal-buttons">
+                        <button class="btn btn-secondary" data-modal-action="cancel-custom">Cancel</button>
+                        <button class="btn" data-modal-action="apply-custom">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Modal -->
+            <div id="history-modal" class="modal">
+                <div class="modal-content history-modal-content">
+                    <div class="modal-header">
+                        <h3>History</h3>
+                        <p>Click on any point in time to restore</p>
+                    </div>
+                    <div id="history-list" class="history-list"></div>
+                    <div class="modal-buttons">
+                        <button class="btn btn-secondary" data-modal-action="close-history">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Backup Modal -->
+            <div id="upload-backup-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-upload"></i> Upload Backup</h3>
+                        <p>Restore your counts from a backup file</p>
+                    </div>
+                    <div class="file-upload" data-modal-action="pick-backup" style="margin-bottom: 20px;">
+                        <input type="file" id="backup-file-input" accept=".json" style="display: none;">
+                        <p><i class="fas fa-file-upload" style="font-size: 2em; margin-bottom: 10px; color: var(--accent-primary);"></i></p>
+                        <p>Click to select a backup file (.json)</p>
+                    </div>
+                    <div id="backup-file-info" style="margin-bottom: 20px; display: none;">
+                        <p style="color: var(--text-primary); font-weight: 600; margin-bottom: 10px;">Selected file:</p>
+                        <p id="backup-file-name" style="color: var(--text-secondary); font-size: 0.9em;"></p>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="btn btn-secondary" data-modal-action="cancel-backup">Cancel</button>
+                        <button class="btn" id="restore-backup-btn" data-modal-action="restore-backup" disabled>Restore Backup</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Count Modal -->
+            <div id="delete-count-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i> Delete Count</h3>
+                        <p>Are you sure you want to delete this count?</p>
+                    </div>
+                    <div style="padding: 20px; background: var(--bg-tertiary); border-radius: 6px; margin-bottom: 20px;">
+                        <p style="color: var(--text-primary); font-weight: 600; margin-bottom: 5px;" id="delete-count-name"></p>
+                        <p style="color: var(--text-secondary); font-size: 0.85em;">This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="btn btn-secondary" data-modal-action="cancel-delete">Cancel</button>
+                        <button class="btn btn-danger" data-modal-action="confirm-delete">Delete Count</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    updateView(view) {
+        this.querySelector('#dashboard-view').classList.toggle('hidden', view !== 'dashboard');
+        this.querySelector('#create-view').classList.toggle('hidden', view !== 'create');
+        this.querySelector('#count-view').classList.toggle('hidden', view !== 'count');
+    }
+
+    // ─── Modals ──────────────────────────────────────────
+
+    setupModals() {
+        this._modalContext = null;
+        this._selectedBackupFile = null;
+        this._countToDelete = null;
+
+        this.addEventListener('click', (e) => {
+            const action = e.target.closest('[data-modal-action]')?.dataset.modalAction;
+            if (!action) {
+                // Close modal on background click
+                if (e.target.classList.contains('modal')) {
+                    e.target.classList.remove('show');
+                }
+                return;
+            }
+
+            switch (action) {
+                case 'cancel-custom':
+                    this.querySelector('#custom-value-modal').classList.remove('show');
+                    break;
+                case 'apply-custom':
+                    this.applyCustomValue();
+                    break;
+                case 'close-history':
+                    this.querySelector('#history-modal').classList.remove('show');
+                    break;
+                case 'pick-backup':
+                    this.querySelector('#backup-file-input').click();
+                    break;
+                case 'cancel-backup':
+                    this.querySelector('#upload-backup-modal').classList.remove('show');
+                    this._selectedBackupFile = null;
+                    break;
+                case 'restore-backup':
+                    this.restoreBackup();
+                    break;
+                case 'cancel-delete':
+                    this.querySelector('#delete-count-modal').classList.remove('show');
+                    this._countToDelete = null;
+                    break;
+                case 'confirm-delete':
+                    this.confirmDeleteCount();
+                    break;
+            }
+        });
+
+        // History item clicks
+        this.addEventListener('click', (e) => {
+            const historyItem = e.target.closest('.history-item');
+            if (historyItem && historyItem.dataset.historyIndex !== undefined) {
+                store.restoreFromHistory(parseInt(historyItem.dataset.historyIndex));
+                this.querySelector('#history-modal').classList.remove('show');
+            }
+        });
+
+        // Backup file selection
+        this.addEventListener('change', (e) => {
+            if (e.target.id === 'backup-file-input') {
+                this.handleBackupFileSelect(e);
+            }
+        });
+
+        // Enter key in modal input
+        this.addEventListener('keydown', (e) => {
+            if (e.target.id === 'modal-input' && e.key === 'Enter') {
+                this.applyCustomValue();
+            }
+        });
+    }
+
+    showCustomValueModal(detail) {
+        const { itemIndex, field, operation } = detail;
+        const count = store.getCurrentCount();
+        if (!count) return;
+        const item = count.items[itemIndex];
+        if (item.completed) return;
+
+        this._modalContext = { itemIndex, field, operation };
+
+        const fieldName = field.charAt(0).toUpperCase() + field.slice(1);
+        this.querySelector('#modal-title').textContent = operation === 'add' ? `Add to ${fieldName}` : `Subtract from ${fieldName}`;
+        this.querySelector('#modal-description').textContent = `${item.posId} - ${item.itemName}`;
+        this.querySelector('#modal-input').value = '';
+        this.querySelector('#custom-value-modal').classList.add('show');
+        this.querySelector('#modal-input').focus();
+    }
+
+    applyCustomValue() {
+        const value = parseInt(this.querySelector('#modal-input').value);
+        if (isNaN(value) || value < 1) {
+            alert('Please enter a valid positive number');
+            return;
+        }
+        const { itemIndex, field, operation } = this._modalContext;
+        const delta = operation === 'add' ? value : -value;
+        store.changeValue(itemIndex, field, delta);
+        this.querySelector('#custom-value-modal').classList.remove('show');
+        this._modalContext = null;
+    }
+
+    showHistoryModal() {
+        this.querySelector('#history-modal').classList.add('show');
+        this.renderHistoryList();
+    }
+
+    renderHistoryList() {
+        const listEl = this.querySelector('#history-list');
+        const history = store.history;
+
+        if (history.past.length === 0) {
+            listEl.innerHTML = '<div class="empty-history">No history available</div>';
+            return;
+        }
+
+        listEl.innerHTML = history.past.slice().reverse().map((snapshot, index) => {
+            const actualIndex = history.past.length - 1 - index;
+            const date = new Date(snapshot.timestamp);
+            const timeStr = date.toLocaleTimeString();
+            const completedCount = snapshot.state.items.filter(i => i.completed).length;
+            const totalItems = snapshot.state.items.length;
+
+            let totalCases = 0, totalInners = 0, totalIndividuals = 0;
+            snapshot.state.items.forEach(item => {
+                totalCases += item.cases;
+                totalInners += item.inners;
+                totalIndividuals += item.individuals;
+            });
+
+            return `
+                <div class="history-item" data-history-index="${actualIndex}">
+                    <div class="history-time">${timeStr}</div>
+                    <div class="history-stats">
+                        <span>${completedCount}/${totalItems} done</span>
+                        <span>Cases: ${totalCases}</span>
+                        <span>Inners: ${totalInners}</span>
+                        <span>Indiv: ${totalIndividuals}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    showUploadBackupModal() {
+        this._selectedBackupFile = null;
+        const modal = this.querySelector('#upload-backup-modal');
+        this.querySelector('#backup-file-input').value = '';
+        this.querySelector('#backup-file-info').style.display = 'none';
+        this.querySelector('#restore-backup-btn').disabled = true;
+        modal.classList.add('show');
+    }
+
+    handleBackupFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        this._selectedBackupFile = file;
+        this.querySelector('#backup-file-name').textContent = file.name;
+        this.querySelector('#backup-file-info').style.display = 'block';
+        this.querySelector('#restore-backup-btn').disabled = false;
+    }
+
+    async restoreBackup() {
+        if (!this._selectedBackupFile) return;
+        const success = await store.restoreBackup(this._selectedBackupFile);
+        if (success) {
+            this.querySelector('#upload-backup-modal').classList.remove('show');
+            this._selectedBackupFile = null;
+        }
+    }
+
+    showDeleteCountModal(countId) {
+        this._countToDelete = countId;
+        const count = store.counts[countId];
+        this.querySelector('#delete-count-name').textContent = count.name;
+        this.querySelector('#delete-count-modal').classList.add('show');
+    }
+
+    async confirmDeleteCount() {
+        if (!this._countToDelete) return;
+        await store.deleteCount(this._countToDelete);
+        this.querySelector('#delete-count-modal').classList.remove('show');
+        this._countToDelete = null;
+    }
+
+    // ─── Keyboard Shortcuts ──────────────────────────────
+
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.querySelectorAll('.modal.show').forEach(m => m.classList.remove('show'));
+            }
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'z' && !e.shiftKey) {
+                    e.preventDefault();
+                    store.undo();
+                } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
+                    e.preventDefault();
+                    store.redo();
+                }
+            }
+        });
+    }
+
+    // ─── Notifications & Celebration ─────────────────────
+
+    showNotification(text) {
+        const notification = document.createElement('div');
+        notification.className = 'undo-notification';
+        notification.textContent = text;
+        document.body.appendChild(notification);
+
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 1500);
+    }
+
+    celebrate() {
+        // Confetti (uses globally loaded canvas-confetti)
+        if (typeof confetti === 'function') {
+            const duration = 3000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10000 };
+
+            const interval = setInterval(() => {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, {
+                    particleCount,
+                    origin: { x: Math.random() * 0.2 + 0.1, y: Math.random() - 0.2 }
+                }));
+                confetti(Object.assign({}, defaults, {
+                    particleCount,
+                    origin: { x: Math.random() * 0.2 + 0.7, y: Math.random() - 0.2 }
+                }));
+            }, 250);
+        }
+
+        // Celebration message
+        const notification = document.createElement('div');
+        notification.className = 'celebration-notification';
+        notification.innerHTML = '<i class="fas fa-trophy"></i> Count Completed! Well done!';
+        document.body.appendChild(notification);
+
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+}
+
+customElements.define('count-app', CountApp);
