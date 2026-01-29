@@ -1,0 +1,552 @@
+/* ===== Theme Definitions ===== */
+
+:root {
+    --bg-primary: #f5f7fa;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f8f9fa;
+    --text-primary: #2d3748;
+    --text-secondary: #718096;
+    --border-color: #e2e8f0;
+    --accent-primary: #667eea;
+    --accent-hover: #5568d3;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --bg-tertiary: #374151;
+    --text-primary: #f7fafc;
+    --text-secondary: #cbd5e0;
+    --border-color: #4a5568;
+    --accent-primary: #667eea;
+    --accent-hover: #5568d3;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== Windows XP Luna ===== */
+
+[data-theme="xp"] {
+    --bg-primary: #ece9d8;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #d6dff7;
+    --text-primary: #000000;
+    --text-secondary: #4a4a4a;
+    --border-color: #aca899;
+    --accent-primary: #3169c6;
+    --accent-hover: #27539e;
+    --shadow-sm: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 3px 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="xp"] body,
+[data-theme="xp"] {
+    font-family: 'Tahoma', 'MS Sans Serif', Geneva, sans-serif;
+}
+
+[data-theme="xp"] .header {
+    background: linear-gradient(180deg, #0a246a 0%, #3a6ea5 100%);
+    color: white;
+    border-bottom: 2px solid #002b7a;
+}
+
+[data-theme="xp"] .header h1,
+[data-theme="xp"] .header p {
+    color: white;
+}
+
+[data-theme="xp"] .app-logo {
+    color: white;
+}
+
+[data-theme="xp"] .btn {
+    background: linear-gradient(180deg, #ffffff 0%, #ece9d8 50%, #d6d2c2 100%);
+    color: #000000;
+    border: 1px solid #003c74;
+    border-radius: 3px;
+    box-shadow: 1px 1px 0px #999;
+}
+
+[data-theme="xp"] .btn:hover {
+    background: linear-gradient(180deg, #fff4cf 0%, #ffd86e 100%);
+    box-shadow: 1px 1px 0px #666;
+}
+
+[data-theme="xp"] .btn:active {
+    box-shadow: inset 1px 1px 2px #666;
+}
+
+[data-theme="xp"] .btn-secondary {
+    background: linear-gradient(180deg, #ffffff 0%, #ece9d8 50%, #d6d2c2 100%);
+    color: #000000;
+    border: 1px solid #aca899;
+}
+
+[data-theme="xp"] .btn-danger {
+    background: linear-gradient(180deg, #ff8888 0%, #dc3545 100%);
+    color: white;
+    border: 1px solid #a02020;
+}
+
+[data-theme="xp"] .count-card,
+[data-theme="xp"] .stat-card,
+[data-theme="xp"] .stats,
+[data-theme="xp"] .info-accordion {
+    border: 2px solid #7f9db9;
+    border-radius: 4px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="xp"] .stat-card-icon {
+    background: linear-gradient(180deg, #3a6ea5 0%, #0a246a 100%);
+    border-radius: 4px;
+}
+
+[data-theme="xp"] .info-accordion-header,
+[data-theme="xp"] .accordion-header {
+    background: linear-gradient(180deg, #ffffff 0%, #d6dff7 100%);
+}
+
+[data-theme="xp"] .view-toggle {
+    border: 2px solid #7f9db9;
+    border-radius: 3px;
+}
+
+[data-theme="xp"] .view-toggle-btn.active {
+    background: #3169c6;
+}
+
+[data-theme="xp"] .theme-toggle {
+    background: linear-gradient(180deg, #ffffff 0%, #ece9d8 50%, #d6d2c2 100%);
+    border: 1px solid #7f9db9;
+    border-radius: 3px;
+}
+
+[data-theme="xp"] .theme-dropdown {
+    border: 2px solid #7f9db9;
+    border-radius: 4px;
+}
+
+[data-theme="xp"] input[type="text"],
+[data-theme="xp"] .search-box input,
+[data-theme="xp"] .modal-input {
+    border: 2px inset #7f9db9;
+    border-radius: 1px;
+}
+
+/* ===== Windows Vista Aero ===== */
+
+[data-theme="aero"] {
+    --bg-primary: #e8eef7;
+    --bg-secondary: rgba(255, 255, 255, 0.82);
+    --bg-tertiary: rgba(210, 225, 245, 0.65);
+    --text-primary: #1a1a1a;
+    --text-secondary: #444c5e;
+    --border-color: rgba(100, 130, 180, 0.45);
+    --accent-primary: #3573b6;
+    --accent-hover: #2a5e99;
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 12px rgba(0, 40, 100, 0.15);
+    --shadow-lg: 0 8px 24px rgba(0, 40, 100, 0.18);
+}
+
+[data-theme="aero"] body,
+[data-theme="aero"] {
+    font-family: 'Segoe UI', 'Calibri', Tahoma, sans-serif;
+}
+
+[data-theme="aero"] .header {
+    background: linear-gradient(180deg,
+        rgba(60, 100, 160, 0.92) 0%,
+        rgba(40, 70, 120, 0.88) 50%,
+        rgba(30, 55, 100, 0.95) 100%);
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(12px);
+}
+
+[data-theme="aero"] .header h1,
+[data-theme="aero"] .header p {
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="aero"] .app-logo {
+    color: white;
+}
+
+[data-theme="aero"] .count-card,
+[data-theme="aero"] .stat-card,
+[data-theme="aero"] .stats,
+[data-theme="aero"] .info-accordion,
+[data-theme="aero"] .modal-content {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 12px rgba(0, 40, 100, 0.12),
+                 inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+}
+
+[data-theme="aero"] .btn {
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(220, 230, 245, 0.8) 45%,
+        rgba(190, 205, 230, 0.85) 50%,
+        rgba(210, 220, 240, 0.9) 100%);
+    color: #1a1a1a;
+    border: 1px solid rgba(80, 110, 160, 0.5);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1),
+                 inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="aero"] .btn:hover {
+    background: linear-gradient(180deg,
+        rgba(234, 246, 255, 0.95) 0%,
+        rgba(200, 225, 255, 0.9) 45%,
+        rgba(170, 200, 240, 0.9) 50%,
+        rgba(190, 215, 250, 0.95) 100%);
+    border-color: rgba(60, 120, 200, 0.6);
+    box-shadow: 0 0 6px rgba(60, 140, 220, 0.3),
+                 inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="aero"] .btn-secondary {
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.85) 0%,
+        rgba(230, 235, 245, 0.75) 100%);
+    color: #1a1a1a;
+    border: 1px solid rgba(100, 130, 180, 0.4);
+}
+
+[data-theme="aero"] .btn-danger {
+    background: linear-gradient(180deg, rgba(220, 80, 80, 0.9) 0%, rgba(180, 40, 40, 0.9) 100%);
+    color: white;
+    border: 1px solid rgba(150, 30, 30, 0.6);
+}
+
+[data-theme="aero"] .stat-card-icon {
+    background: linear-gradient(135deg, rgba(60, 120, 200, 0.85), rgba(40, 80, 160, 0.9));
+    backdrop-filter: blur(4px);
+    border-radius: 6px;
+}
+
+[data-theme="aero"] .info-accordion-header,
+[data-theme="aero"] .accordion-header {
+    background: rgba(210, 225, 245, 0.5);
+    backdrop-filter: blur(8px);
+}
+
+[data-theme="aero"] .view-toggle {
+    background: rgba(210, 225, 245, 0.4);
+    border: 1px solid rgba(100, 130, 180, 0.35);
+    backdrop-filter: blur(8px);
+}
+
+[data-theme="aero"] .view-toggle-btn.active {
+    background: rgba(53, 115, 182, 0.85);
+}
+
+[data-theme="aero"] .theme-toggle {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+}
+
+[data-theme="aero"] .theme-dropdown {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="aero"] input[type="text"],
+[data-theme="aero"] .search-box input,
+[data-theme="aero"] .modal-input {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(80, 110, 160, 0.4);
+    backdrop-filter: blur(4px);
+}
+
+[data-theme="aero"] .table-wrapper,
+[data-theme="aero"] .counts-table-wrapper {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* ===== Star Trek LCARS ===== */
+
+[data-theme="lcars"] {
+    --bg-primary: #000000;
+    --bg-secondary: #111111;
+    --bg-tertiary: #1a1a1a;
+    --text-primary: #ff9900;
+    --text-secondary: #cc99cc;
+    --border-color: #cc6699;
+    --accent-primary: #ff9966;
+    --accent-hover: #cc7744;
+    --shadow-sm: 0 0 4px rgba(255, 153, 0, 0.15);
+    --shadow-md: 0 0 8px rgba(255, 153, 0, 0.2);
+    --shadow-lg: 0 0 16px rgba(255, 153, 0, 0.25);
+}
+
+[data-theme="lcars"] body,
+[data-theme="lcars"] {
+    font-family: 'Century Gothic', 'Avant Garde', 'Trebuchet MS', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+[data-theme="lcars"] .header {
+    background: #000000;
+    border-bottom: 4px solid #ff9966;
+    position: relative;
+}
+
+[data-theme="lcars"] .header::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    background: #cc6699;
+    border-radius: 0 0 40px 0;
+}
+
+[data-theme="lcars"] .header::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    background: #9999cc;
+    border-radius: 0 0 0 40px;
+}
+
+[data-theme="lcars"] .header-content {
+    position: relative;
+    z-index: 1;
+}
+
+[data-theme="lcars"] .header h1 {
+    color: #ff9900;
+}
+
+[data-theme="lcars"] .header p {
+    color: #cc99cc;
+}
+
+[data-theme="lcars"] .app-logo {
+    color: #ff9966;
+}
+
+[data-theme="lcars"] .count-card,
+[data-theme="lcars"] .stat-card,
+[data-theme="lcars"] .stats,
+[data-theme="lcars"] .info-accordion {
+    background: #111111;
+    border: 2px solid #cc6699;
+    border-radius: 0 20px 20px 0;
+    position: relative;
+}
+
+[data-theme="lcars"] .count-card::before,
+[data-theme="lcars"] .stat-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background: #ff9966;
+    border-radius: 0;
+}
+
+[data-theme="lcars"] .stat-card {
+    padding-left: 28px;
+}
+
+[data-theme="lcars"] .count-card {
+    padding-left: 28px;
+}
+
+[data-theme="lcars"] .stat-card-icon {
+    background: #cc6699;
+    border-radius: 0 12px 12px 0;
+}
+
+[data-theme="lcars"] .btn {
+    background: #cc6699;
+    color: #000000;
+    border: none;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+[data-theme="lcars"] .btn:hover {
+    background: #ff9966;
+    box-shadow: 0 0 12px rgba(255, 153, 102, 0.4);
+}
+
+[data-theme="lcars"] .btn-secondary {
+    background: #9999cc;
+    color: #000000;
+    border: none;
+}
+
+[data-theme="lcars"] .btn-secondary:hover {
+    background: #bbbbee;
+}
+
+[data-theme="lcars"] .btn-danger {
+    background: #cc3333;
+    color: #ffffff;
+}
+
+[data-theme="lcars"] .info-accordion-header,
+[data-theme="lcars"] .accordion-header {
+    background: #1a1a1a;
+    border-bottom: 2px solid #9999cc;
+}
+
+[data-theme="lcars"] .view-toggle {
+    background: #1a1a1a;
+    border: 2px solid #cc6699;
+    border-radius: 20px;
+}
+
+[data-theme="lcars"] .view-toggle-btn {
+    border-radius: 20px;
+    color: #cc99cc;
+}
+
+[data-theme="lcars"] .view-toggle-btn.active {
+    background: #ff9966;
+    color: #000000;
+}
+
+[data-theme="lcars"] .theme-toggle {
+    background: #cc6699;
+    border: none;
+    border-radius: 20px;
+}
+
+[data-theme="lcars"] .theme-dropdown {
+    background: #111111;
+    border: 2px solid #cc6699;
+    border-radius: 0 12px 12px 0;
+}
+
+[data-theme="lcars"] .theme-option:hover {
+    background: #1a1a1a;
+}
+
+[data-theme="lcars"] .theme-option.active {
+    background: #cc6699;
+    color: #000000;
+}
+
+[data-theme="lcars"] input[type="text"],
+[data-theme="lcars"] .search-box input,
+[data-theme="lcars"] .modal-input {
+    background: #1a1a1a;
+    border: 2px solid #9999cc;
+    color: #ff9900;
+    border-radius: 20px;
+}
+
+[data-theme="lcars"] input[type="text"]:focus,
+[data-theme="lcars"] .search-box input:focus,
+[data-theme="lcars"] .modal-input:focus {
+    border-color: #ff9966;
+    box-shadow: 0 0 8px rgba(255, 153, 102, 0.3);
+}
+
+[data-theme="lcars"] .table-wrapper,
+[data-theme="lcars"] .counts-table-wrapper {
+    border: 2px solid #cc6699;
+    border-radius: 0 12px 12px 0;
+    background: #111111;
+}
+
+[data-theme="lcars"] .items-table th,
+[data-theme="lcars"] .counts-table-inner th {
+    background: #cc6699;
+    color: #000000;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+[data-theme="lcars"] .counter-btn {
+    background: #ff9966;
+    color: #000000;
+    border-radius: 20px;
+}
+
+[data-theme="lcars"] .counter-btn:hover {
+    background: #cc6699;
+}
+
+[data-theme="lcars"] .modal-content {
+    background: #111111;
+    border: 2px solid #cc6699;
+    border-radius: 0 20px 20px 0;
+}
+
+[data-theme="lcars"] .modal-content::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background: #9999cc;
+}
+
+[data-theme="lcars"] .dashboard-header {
+    border-bottom: 3px solid #ff9966;
+}
+
+[data-theme="lcars"] .counts-section-header {
+    border-bottom: 3px solid #cc6699;
+}
+
+[data-theme="lcars"] .celebration-notification {
+    background: linear-gradient(135deg, #cc6699 0%, #ff9966 100%);
+}
+
+[data-theme="lcars"] .file-upload {
+    border: 2px dashed #9999cc;
+    background: #1a1a1a;
+}
+
+[data-theme="lcars"] .file-upload:hover {
+    border-color: #ff9966;
+    background: #111111;
+}
+
+[data-theme="lcars"] .donut-ring {
+    background: conic-gradient(
+        #ff9966 0% var(--usage-percent),
+        #cc6699 var(--usage-percent) 100%
+    );
+}
+
+@media (max-width: 767px) {
+    [data-theme="lcars"] .header::before {
+        width: 60px;
+    }
+    [data-theme="lcars"] .header::after {
+        width: 40px;
+    }
+}
