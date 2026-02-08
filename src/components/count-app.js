@@ -505,6 +505,12 @@ class CountApp extends HTMLElement {
         };
     }
 
+    generateReportFilename(extension) {
+        const count = store.getCurrentCount();
+        const timestamp = new Date().toISOString().split('T')[0];
+        return `${count.name.replace(/[^a-z0-9]/gi, '_')}_report_${timestamp}.${extension}`;
+    }
+
     async exportReportAsPNG() {
         const reportContent = this.querySelector('#report-content');
         if (!reportContent) return;
@@ -519,9 +525,7 @@ class CountApp extends HTMLElement {
             const canvas = await html2canvas(reportContent, this.getHtml2CanvasConfig());
 
             const link = document.createElement('a');
-            const count = store.getCurrentCount();
-            const timestamp = new Date().toISOString().split('T')[0];
-            link.download = `${count.name.replace(/[^a-z0-9]/gi, '_')}_report_${timestamp}.png`;
+            link.download = this.generateReportFilename('png');
             link.href = canvas.toDataURL('image/png');
             link.click();
 
@@ -552,8 +556,14 @@ class CountApp extends HTMLElement {
 
             const imgData = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
+            
+            // Use original content dimensions for orientation (scaled canvas dimensions / scale factor)
+            const scale = this.getHtml2CanvasConfig().scale;
+            const contentWidth = canvas.width / scale;
+            const contentHeight = canvas.height / scale;
+            
             const pdf = new jsPDF({
-                orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+                orientation: contentWidth > contentHeight ? 'landscape' : 'portrait',
                 unit: 'mm',
                 format: 'a4'
             });
@@ -573,9 +583,7 @@ class CountApp extends HTMLElement {
                 pdf.addImage(imgData, 'PNG', 10, 10, scaledWidth, scaledHeight);
             }
 
-            const count = store.getCurrentCount();
-            const timestamp = new Date().toISOString().split('T')[0];
-            pdf.save(`${count.name.replace(/[^a-z0-9]/gi, '_')}_report_${timestamp}.pdf`);
+            pdf.save(this.generateReportFilename('pdf'));
 
             this.showNotification('Report exported as PDF');
         } catch (error) {
