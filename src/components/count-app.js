@@ -412,7 +412,7 @@ class CountApp extends HTMLElement {
         const completedItems = count.items.filter(item => item.completed);
         
         if (completedItems.length === 0) {
-            alert('No completed items to report');
+            this.showNotification('No completed items to report');
             return;
         }
 
@@ -518,7 +518,7 @@ class CountApp extends HTMLElement {
             this.showNotification('Report exported as PNG');
         } catch (error) {
             console.error('Error exporting PNG:', error);
-            alert('Failed to export as PNG. Please try again.');
+            this.showNotification('Failed to export as PNG');
         }
     }
 
@@ -541,10 +541,20 @@ class CountApp extends HTMLElement {
                 format: 'a4'
             });
 
-            const imgWidth = pdf.internal.pageSize.getWidth() - 20;
+            const pageWidth = pdf.internal.pageSize.getWidth() - 20;
+            const pageHeight = pdf.internal.pageSize.getHeight() - 20;
+            const imgWidth = pageWidth;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             
-            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+            // If content fits on one page, add it directly
+            if (imgHeight <= pageHeight) {
+                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+            } else {
+                // Scale down to fit page
+                const scaledHeight = pageHeight;
+                const scaledWidth = (canvas.width * scaledHeight) / canvas.height;
+                pdf.addImage(imgData, 'PNG', 10, 10, scaledWidth, scaledHeight);
+            }
 
             const count = store.getCurrentCount();
             const timestamp = new Date().toISOString().split('T')[0];
@@ -553,7 +563,7 @@ class CountApp extends HTMLElement {
             this.showNotification('Report exported as PDF');
         } catch (error) {
             console.error('Error exporting PDF:', error);
-            alert('Failed to export as PDF. Please try again.');
+            this.showNotification('Failed to export as PDF');
         }
     }
 }
