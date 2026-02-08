@@ -508,7 +508,11 @@ class CountApp extends HTMLElement {
     generateReportFilename(extension) {
         const count = store.getCurrentCount();
         const timestamp = new Date().toISOString().split('T')[0];
-        return `${count.name.replace(/[^a-z0-9]/gi, '_')}_report_${timestamp}.${extension}`;
+        // Sanitize filename: replace non-alphanumeric chars, collapse underscores, trim edges
+        const sanitizedName = count.name
+            .replace(/[^a-z0-9]+/gi, '_')
+            .replace(/^_|_$/g, '');
+        return `${sanitizedName}_report_${timestamp}.${extension}`;
     }
 
     async exportReportAsPNG() {
@@ -557,13 +561,9 @@ class CountApp extends HTMLElement {
             const imgData = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
             
-            // Use original content dimensions for orientation (scaled canvas dimensions / scale factor)
-            const scale = this.getHtml2CanvasConfig().scale;
-            const contentWidth = canvas.width / scale;
-            const contentHeight = canvas.height / scale;
-            
+            // Use canvas dimensions for orientation (aspect ratio is already correct)
             const pdf = new jsPDF({
-                orientation: contentWidth > contentHeight ? 'landscape' : 'portrait',
+                orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
                 unit: 'mm',
                 format: 'a4'
             });
