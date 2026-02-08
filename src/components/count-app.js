@@ -497,16 +497,26 @@ class CountApp extends HTMLElement {
         return div.innerHTML;
     }
 
+    getHtml2CanvasConfig() {
+        return {
+            backgroundColor: '#ffffff',
+            scale: 2,
+            logging: false
+        };
+    }
+
     async exportReportAsPNG() {
         const reportContent = this.querySelector('#report-content');
         if (!reportContent) return;
 
+        // Check if html2canvas is available
+        if (typeof html2canvas === 'undefined') {
+            this.showNotification('Export library not loaded');
+            return;
+        }
+
         try {
-            const canvas = await html2canvas(reportContent, {
-                backgroundColor: '#ffffff',
-                scale: 2,
-                logging: false
-            });
+            const canvas = await html2canvas(reportContent, this.getHtml2CanvasConfig());
 
             const link = document.createElement('a');
             const count = store.getCurrentCount();
@@ -526,12 +536,19 @@ class CountApp extends HTMLElement {
         const reportContent = this.querySelector('#report-content');
         if (!reportContent) return;
 
+        // Check if libraries are available
+        if (typeof html2canvas === 'undefined') {
+            this.showNotification('Export library not loaded');
+            return;
+        }
+
+        if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+            this.showNotification('PDF library not loaded');
+            return;
+        }
+
         try {
-            const canvas = await html2canvas(reportContent, {
-                backgroundColor: '#ffffff',
-                scale: 2,
-                logging: false
-            });
+            const canvas = await html2canvas(reportContent, this.getHtml2CanvasConfig());
 
             const imgData = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
