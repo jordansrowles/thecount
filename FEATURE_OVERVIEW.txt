@@ -1,0 +1,117 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    REPORT GENERATION FEATURE OVERVIEW                          ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  USER FLOW                                                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  1. User opens a count                                                       │
+│     └──> Count View loads with items                                         │
+│                                                                              │
+│  2. User marks items as "Done"                                               │
+│     └──> Items move to completed state                                       │
+│                                                                              │
+│  3. User clicks "Generate Report" button                                     │
+│     └──> Report Modal opens                                                  │
+│         ├─ Shows summary statistics                                          │
+│         └─ Displays table of completed items                                 │
+│                                                                              │
+│  4. User chooses export format:                                              │
+│     ├─ "Export as PNG" → Downloads high-res image                            │
+│     └─ "Export as PDF" → Downloads formatted PDF                             │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  TECHNICAL ARCHITECTURE                                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Components:                                                                 │
+│  ┌──────────────────────────────────────────────────────────────────┐       │
+│  │ count-view.js                                                     │       │
+│  │  └─ "Generate Report" button                                      │       │
+│  │     └─ Dispatches 'show-report-modal' event                       │       │
+│  └──────────────────────────────────────────────────────────────────┘       │
+│          │                                                                   │
+│          ▼                                                                   │
+│  ┌──────────────────────────────────────────────────────────────────┐       │
+│  │ count-app.js (Main Component)                                     │       │
+│  │  ├─ Report Modal (HTML structure)                                 │       │
+│  │  ├─ showReportModal()                                             │       │
+│  │  │   └─ Filters completed items                                   │       │
+│  │  ├─ generateReportHTML()                                          │       │
+│  │  │   └─ Creates formatted HTML with stats                         │       │
+│  │  ├─ exportReportAsPNG()                                           │       │
+│  │  │   └─ html2canvas → PNG download                                │       │
+│  │  └─ exportReportAsPDF()                                           │       │
+│  │      └─ html2canvas → jsPDF → PDF download                        │       │
+│  └──────────────────────────────────────────────────────────────────┘       │
+│                                                                              │
+│  External Libraries:                                                         │
+│  ┌──────────────────────────────────────────────────────────────────┐       │
+│  │ html2canvas (v1.4.1)  → Converts HTML to canvas                  │       │
+│  │ jsPDF (v2.5.1)        → Generates PDF from images                 │       │
+│  └──────────────────────────────────────────────────────────────────┘       │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  REPORT STRUCTURE                                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ╔════════════════════════════════════════════════════════════════╗         │
+│  ║                                                                 ║         │
+│  ║  Count Report: [Count Name]                                    ║         │
+│  ║  Generated: [Date] at [Time]                                   ║         │
+│  ║                                                                 ║         │
+│  ╠═════════════════════════════════════════════════════════════════╣         │
+│  ║  Summary                                                        ║         │
+│  ║  ┌──────────────────────┐  ┌──────────────────────┐            ║         │
+│  ║  │ Total Completed: 25  │  │ Total Cases: 150     │            ║         │
+│  ║  └──────────────────────┘  └──────────────────────┘            ║         │
+│  ║  ┌──────────────────────┐  ┌──────────────────────┐            ║         │
+│  ║  │ Total Inners: 300    │  │ Total Individuals: 75│            ║         │
+│  ║  └──────────────────────┘  └──────────────────────┘            ║         │
+│  ╠═════════════════════════════════════════════════════════════════╣         │
+│  ║  Completed Items                                                ║         │
+│  ║  ┌───────────────────────────────────────────────────────┐     ║         │
+│  ║  │ PosID | Item Name    | Cases | Inners | Individuals  │     ║         │
+│  ║  ├───────────────────────────────────────────────────────┤     ║         │
+│  ║  │ A001  | Product 1    │   5   │   10   │      2       │     ║         │
+│  ║  │ A002  | Product 2    │   3   │    8   │      1       │     ║         │
+│  ║  │ ...                                                    │     ║         │
+│  ║  └───────────────────────────────────────────────────────┘     ║         │
+│  ║                                                                 ║         │
+│  ╚════════════════════════════════════════════════════════════════╝         │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FILES CHANGED                                                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  src/index.html              (+2 lines)     → Added library imports          │
+│  src/components/count-app.js (+215 lines)   → Main implementation           │
+│  src/components/count-view.js (+4 lines)    → Added button                  │
+│  src/css/components.css      (+148 lines)   → Report styling                │
+│  REPORT_FEATURE.md           (new file)     → Feature documentation         │
+│                                                                              │
+│  Total: 448 lines added across 5 files                                      │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SECURITY & QUALITY                                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ✓ Code Review: All comments addressed                                      │
+│  ✓ Error Handling: Robust library checks and graceful failures              │
+│  ✓ User Feedback: Consistent notification system                            │
+│  ✓ Code Quality: No duplication, clean helpers                              │
+│  ✓ Security: CodeQL analysis completed                                      │
+│                                                                              │
+│  ⚠ Note: External CDN libraries without SRI (consistent with app pattern)   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
