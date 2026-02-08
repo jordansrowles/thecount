@@ -1119,3 +1119,151 @@
         justify-content: center;
     }
 }
+
+/* ===== Report Modal ===== */
+
+.report-modal-content {
+    max-width: 900px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.report-content {
+    max-height: 500px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+}
+
+.report-document {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    color: #333;
+}
+
+.report-header {
+    text-align: center;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.report-header h1 {
+    color: #667eea;
+    margin: 0 0 10px 0;
+    font-size: 2em;
+}
+
+.report-date {
+    color: #666;
+    margin: 0;
+    font-size: 0.95em;
+}
+
+.report-summary {
+    margin-bottom: 30px;
+}
+
+.report-summary h2 {
+    color: #333;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+.report-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.report-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    border-left: 4px solid #667eea;
+}
+
+.report-stat-label {
+    font-weight: 600;
+    color: #555;
+}
+
+.report-stat-value {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.report-items h2 {
+    color: #333;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.report-table thead {
+    background: #667eea;
+    color: white;
+}
+
+.report-table th,
+.report-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.report-table th {
+    font-weight: 600;
+}
+
+.report-table tbody tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.report-table tbody tr:hover {
+    background: #f0f0f0;
+}
+
+@media (max-width: 768px) {
+    .report-modal-content {
+        max-width: 95%;
+    }
+
+    .report-document {
+        padding: 15px;
+    }
+
+    .report-header h1 {
+        font-size: 1.5em;
+    }
+
+    .report-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .report-table {
+        font-size: 0.85em;
+    }
+
+    .report-table th,
+    .report-table td {
+        padding: 8px;
+    }
+}

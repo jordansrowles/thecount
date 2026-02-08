@@ -69,6 +69,7 @@ class CountView extends HTMLElement {
                 <button class="btn btn-small" data-action="undo"><i class="fas fa-undo"></i> Undo</button>
                 <button class="btn btn-small" data-action="redo"><i class="fas fa-redo"></i> Redo</button>
                 <button class="btn btn-small btn-secondary" data-action="show-history"><i class="fas fa-clock-rotate-left"></i> History</button>
+                <button class="btn btn-small btn-secondary" data-action="generate-report"><i class="fas fa-file-alt"></i> Generate Report</button>
                 <button class="btn btn-small btn-secondary" data-action="export"><i class="fas fa-download"></i> Export</button>
                 <button class="btn btn-small btn-danger" data-action="delete"><i class="fas fa-trash"></i> Delete</button>
             </div>
@@ -103,6 +104,9 @@ class CountView extends HTMLElement {
                 case 'redo': store.redo(); break;
                 case 'show-history':
                     this.dispatchEvent(new CustomEvent('show-history-modal', { bubbles: true }));
+                    break;
+                case 'generate-report':
+                    this.dispatchEvent(new CustomEvent('show-report-modal', { bubbles: true }));
                     break;
                 case 'export': store.exportCount(); break;
                 case 'delete':

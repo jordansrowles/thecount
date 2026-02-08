@@ -26,6 +26,7 @@ class CountApp extends HTMLElement {
         this.addEventListener('show-history-modal', () => this.showHistoryModal());
         this.addEventListener('show-upload-backup-modal', () => this.showUploadBackupModal());
         this.addEventListener('show-delete-count-modal', (e) => this.showDeleteCountModal(e.detail.countId));
+        this.addEventListener('show-report-modal', () => this.showReportModal());
 
         // Initialize
         store.init();
@@ -115,6 +116,22 @@ class CountApp extends HTMLElement {
                     </div>
                 </div>
             </div>
+
+            <!-- Report Modal -->
+            <div id="report-modal" class="modal">
+                <div class="modal-content report-modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-file-alt"></i> Count Report</h3>
+                        <p>Report of all completed items</p>
+                    </div>
+                    <div id="report-content" class="report-content"></div>
+                    <div class="modal-buttons">
+                        <button class="btn btn-secondary" data-modal-action="close-report">Close</button>
+                        <button class="btn" data-modal-action="export-png"><i class="fas fa-image"></i> Export as PNG</button>
+                        <button class="btn" data-modal-action="export-pdf"><i class="fas fa-file-pdf"></i> Export as PDF</button>
+                    </div>
+                </div>
+            </div>
         `;
     }
 
@@ -167,6 +184,15 @@ class CountApp extends HTMLElement {
                     break;
                 case 'confirm-delete':
                     this.confirmDeleteCount();
+                    break;
+                case 'close-report':
+                    this.querySelector('#report-modal').classList.remove('show');
+                    break;
+                case 'export-png':
+                    this.exportReportAsPNG();
+                    break;
+                case 'export-pdf':
+                    this.exportReportAsPDF();
                     break;
             }
         });
@@ -375,6 +401,160 @@ class CountApp extends HTMLElement {
             notification.classList.remove('show');
             setTimeout(() => notification.remove(), 300);
         }, 3000);
+    }
+
+    // ─── Report Generation ───────────────────────────────
+
+    showReportModal() {
+        const count = store.getCurrentCount();
+        if (!count) return;
+
+        const completedItems = count.items.filter(item => item.completed);
+        
+        if (completedItems.length === 0) {
+            alert('No completed items to report');
+            return;
+        }
+
+        const reportContent = this.generateReportHTML(count, completedItems);
+        this.querySelector('#report-content').innerHTML = reportContent;
+        this.querySelector('#report-modal').classList.add('show');
+    }
+
+    generateReportHTML(count, completedItems) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString();
+        const timeStr = now.toLocaleTimeString();
+
+        let totalCases = 0, totalInners = 0, totalIndividuals = 0;
+        completedItems.forEach(item => {
+            totalCases += item.cases;
+            totalInners += item.inners;
+            totalIndividuals += item.individuals;
+        });
+
+        return `
+            <div class="report-document">
+                <div class="report-header">
+                    <h1>Count Report: ${this.escapeHtml(count.name)}</h1>
+                    <p class="report-date">Generated: ${dateStr} at ${timeStr}</p>
+                </div>
+
+                <div class="report-summary">
+                    <h2>Summary</h2>
+                    <div class="report-stats">
+                        <div class="report-stat">
+                            <span class="report-stat-label">Total Completed Items:</span>
+                            <span class="report-stat-value">${completedItems.length}</span>
+                        </div>
+                        <div class="report-stat">
+                            <span class="report-stat-label">Total Cases:</span>
+                            <span class="report-stat-value">${totalCases}</span>
+                        </div>
+                        <div class="report-stat">
+                            <span class="report-stat-label">Total Inners:</span>
+                            <span class="report-stat-value">${totalInners}</span>
+                        </div>
+                        <div class="report-stat">
+                            <span class="report-stat-label">Total Individuals:</span>
+                            <span class="report-stat-value">${totalIndividuals}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-items">
+                    <h2>Completed Items</h2>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>PosID</th>
+                                <th>Item Name</th>
+                                <th>Cases</th>
+                                <th>Inners</th>
+                                <th>Individuals</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${completedItems.map(item => `
+                                <tr>
+                                    <td>${this.escapeHtml(item.posId)}</td>
+                                    <td>${this.escapeHtml(item.itemName)}</td>
+                                    <td>${item.cases}</td>
+                                    <td>${item.inners}</td>
+                                    <td>${item.individuals}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    async exportReportAsPNG() {
+        const reportContent = this.querySelector('#report-content');
+        if (!reportContent) return;
+
+        try {
+            const canvas = await html2canvas(reportContent, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                logging: false
+            });
+
+            const link = document.createElement('a');
+            const count = store.getCurrentCount();
+            const timestamp = new Date().toISOString().split('T')[0];
+            link.download = `${count.name.replace(/[^a-z0-9]/gi, '_')}_report_${timestamp}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+
+            this.showNotification('Report exported as PNG');
+        } catch (error) {
+            console.error('Error exporting PNG:', error);
+            alert('Failed to export as PNG. Please try again.');
+        }
+    }
+
+    async exportReportAsPDF() {
+        const reportContent = this.querySelector('#report-content');
+        if (!reportContent) return;
+
+        try {
+            const canvas = await html2canvas(reportContent, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                logging: false
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const imgWidth = pdf.internal.pageSize.getWidth() - 20;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+
+            const count = store.getCurrentCount();
+            const timestamp = new Date().toISOString().split('T')[0];
+            pdf.save(`${count.name.replace(/[^a-z0-9]/gi, '_')}_report_${timestamp}.pdf`);
+
+            this.showNotification('Report exported as PDF');
+        } catch (error) {
+            console.error('Error exporting PDF:', error);
+            alert('Failed to export as PDF. Please try again.');
+        }
     }
 }
 
